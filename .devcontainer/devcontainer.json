@@ -6,7 +6,7 @@
             "BASE_IMAGE": "scilus/scilus:latest"
         }
     },
-    "onCreateCommand": "bash .devcontainer/bash_history.sh",
+    "onCreateCommand": "bash .devcontainer/onCreateCommand.sh",
     "postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
     "features": {
         "ghcr.io/devcontainers/features/git:1": {},
