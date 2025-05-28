@@ -1,0 +1,6 @@
+{
+    "nextflow.completion.extended": true,
+    "nextflow.debug": true,
+    "nextflow.formatting.harshilAlignment": true,
+    "nextflow.formatting.sortDeclarations": true
+}
