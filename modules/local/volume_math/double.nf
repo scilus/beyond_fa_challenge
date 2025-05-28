@@ -17,9 +17,9 @@ process VOLUME_MATH {
 
     script:
     assert task.ext.operation in ['substraction', 'division',
-    'difference'] : "Operation ${task.ext.operation} not \
+    'difference', 'union', 'intersection'] : "Operation ${task.ext.operation} not \
     supported. Supported operations are: \
-    'substraction', 'division', 'difference'"
+    'substraction', 'division', 'difference', 'union', 'intersection'"
 
     def prefix = task.ext.prefix ?: "${meta.id}"
     def suffix = task.ext.suffix ?: "output"
