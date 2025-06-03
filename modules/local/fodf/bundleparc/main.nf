@@ -17,7 +17,7 @@ process BUNDLEPARC {
     def nb_points = task.ext.nb_points ? "--nb_pts " + task.ext.nb_points : ""
 
     """
-    bundleparc_predict.py ${fodf} ${checkpoint} --out_prefix ${prefix}__ ${nb_points} --out_folder bundleparc --half
+    bundleparc_predict.py ${fodf} --out_prefix ${prefix}__ ${nb_points} --out_folder bundleparc --half
     
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
