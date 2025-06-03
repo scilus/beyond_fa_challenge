@@ -1,0 +1,41 @@
+{
+    "name": "Beyond FA devcontainer - SCIL team",
+    "build": {
+        "dockerfile": "../Dockerfile",
+        "args": {
+            "BASE_IMAGE": "scilus/scilus:latest"
+        }
+    },
+    "onCreateCommand": "bash .devcontainer/onCreateCommand.sh",
+    "postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "dockerDashComposeVersion": "none",
+            "installDockerComposeSwitch": false
+        },
+        "ghcr.io/robsyme/features/nextflow:1": {}
+    },
+    "remoteUser": "root",
+    "mounts": [
+        {
+            "target": "/tmp",
+            "type": "volume"
+        },
+        {
+            "source": "nf-neuro-bash-history",
+            "target": "/commandhistory",
+            "type": "volume"
+        }
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "KorbinianEckstein.niivue",
+                "nextflow.nextflow"
+            ]
+        }
+    },
+    "init": true,
+    "privileged": true
+}
