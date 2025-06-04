@@ -10,9 +10,9 @@ include { RECONST_FODF as FODF           } from './modules/nf-neuro/reconst/fodf
 
 
 workflow {
-    ch_in_jhu_t1 = Channel.fromFilePairs("../JHU/JHU-ICBM-T1-1mm.nii.gz")
+    ch_in_jhu_t1 = Channel.fromFilePairs("$projectDir/data/JHU/JHU-ICBM-T1-1mm.nii.gz")
         { "JHU" }
-    ch_in_jhu_fa = Channel.fromFilePairs("../JHU/JHU-ICBM-FA-1mm.nii.gz")
+    ch_in_jhu_fa = Channel.fromFilePairs("$projectDir/data/JHU/JHU-ICBM-FA-1mm.nii.gz")
         { "JHU" }
     ch_in_mha_dwi = Channel.fromFilePairs("$params.input/dwi-4d-mri/*.mha")
         { file(it).simpleName }
@@ -22,7 +22,7 @@ workflow {
     //      - out.dwi
     //      - out.bval
     //      - out.bvec
-    ch_in_nifti_bvalbvec = Channel.fromFilePairs("$params.input/*.{nii.gz,bval,bvec}", size: 3, flat: true)
+    ch_in_nifti_bvalbvec = Channel.fromFilePairs("$params.input/**/*.{nii.gz,bval,bvec}", size: 3, flat: true)
         { file(it).simpleName.tokenize("_")[0..1].join("_") }
         .map{ id, bval, bvec, dwi -> [[id: id], dwi, bval, bvec] }
         .multiMap{ meta, dwi, bval, bvec ->
