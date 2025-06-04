@@ -7,6 +7,7 @@ include { VOLUME_MATH as FA_LTHRESHOLD;
           VOLUME_MATH as FA_HOLEFILL     } from './modules/local/volume_math/single.nf'
 include { VOLUME_MATH as FA_INTERSECTION } from './modules/local/volume_math/double.nf'
 include { RECONST_FODF as FODF           } from './modules/nf-neuro/reconst/fodf' 
+include { CONVERT_CHALLENGE_INPUTS } from './modules/local/utils/convert.nf'
 
 
 workflow {
@@ -14,22 +15,12 @@ workflow {
         { "JHU" }
     ch_in_jhu_fa = Channel.fromFilePairs("$projectDir/data/JHU/JHU-ICBM-FA-1mm.nii.gz")
         { "JHU" }
-    ch_in_mha_dwi = Channel.fromFilePairs("$params.input/dwi-4d-mri/*.mha")
-        { file(it).simpleName }
 
-    // 1. Convert mha to Nifti/bval/bvec
-    //  - OUTPUTS :
-    //      - out.dwi
-    //      - out.bval
-    //      - out.bvec
-    ch_in_nifti_bvalbvec = Channel.fromFilePairs("$params.input/**/*.{nii.gz,bval,bvec}", size: 3, flat: true)
+    ch_in_mha_json = Channel.fromFilePairs("$params.input/**/*.{mha,json}", size: 2, flat: true)
         { file(it).simpleName.tokenize("_")[0..1].join("_") }
-        .map{ id, bval, bvec, dwi -> [[id: id], dwi, bval, bvec] }
-        .multiMap{ meta, dwi, bval, bvec ->
-            dwi: [meta, dwi]
-            bval: [meta, bval]
-            bvec: [meta, bvec]
-        }
+        .map{ id, json, mha -> [[id: id], mha, json] }
+
+    ch_in_nifti_bvalbvec = CONVERT_CHALLENGE_INPUTS( ch_in_mha_json )
 
     // 2. Upsample DWI
     ch_dwi_to_upsample = ch_in_nifti_bvalbvec.dwi
