@@ -5,6 +5,11 @@
     "https://github.com/scilus/nf-neuro.git": {
       "modules": {
         "nf-neuro": {
+          "betcrop/fslbetcrop": {
+            "branch": "main",
+            "git_sha": "ab9e5404528545237c63c5d887b5a54079529b01",
+            "installed_by": ["modules"]
+          },
           "bundle/recognize": {
             "branch": "main",
             "git_sha": "ae4fba133e99e526b20f5642c18cfd895b45ca5d",
