@@ -7,6 +7,7 @@ include { VOLUME_MATH as FA_LTHRESHOLD;
           VOLUME_MATH as FA_HOLEFILL     } from './modules/local/volume_math/single.nf'
 include { VOLUME_MATH as FA_INTERSECTION } from './modules/local/volume_math/double.nf'
 include { RECONST_FODF as FODF           } from './modules/nf-neuro/reconst/fodf' 
+include { BUNDLEPARC as BUNDLEPARC       } from './modules/local/fodf/bundleparc' 
 
 
 workflow {
@@ -97,4 +98,7 @@ workflow {
 
     FODF ( ch_input_fodf )
 
+    // 7. BundleParc   
+    ch_fodf = FODF.out.fodf
+    BUNDLEPARC ( ch_fodf )
 }
