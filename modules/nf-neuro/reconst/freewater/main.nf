@@ -33,7 +33,7 @@ process RECONST_FREEWATER {
     def lambda2 = task.ext.lambda2 ? "--lambda2 " + task.ext.lambda2 : ""
     def nb_threads = task.ext.nb_threads ? "--processes " + task.ext.nb_threads : ""
     def b_thr = task.ext.b_thr ? "--b_thr " + task.ext.b_thr : ""
-    def set_kernels = kernels ? "--load_kernels $kernels" : "--save_kernels kernels/ --compute_only"
+    def set_kernels = kernels ? "--load_kernels $kernels" : ""
     def set_mask = mask ? "--mask $mask" : ""
 
     """
