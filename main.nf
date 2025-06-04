@@ -10,9 +10,9 @@ include { RECONST_FODF as FODF           } from './modules/nf-neuro/reconst/fodf
 
 
 workflow {
-    ch_in_jhu_t1 = Channel.fromFilePairs("$projectDir/JHU/JHU-ICBM-T1-1mm.nii.gz")
+    ch_in_jhu_t1 = Channel.fromFilePairs("$projectDir/data/JHU/JHU-ICBM-T1-1mm.nii.gz")
         { "JHU" }
-    ch_in_jhu_fa = Channel.fromFilePairs("$projectDir/JHU/JHU-ICBM-FA-1mm.nii.gz")
+    ch_in_jhu_fa = Channel.fromFilePairs("$projectDir/data/JHU/JHU-ICBM-FA-1mm.nii.gz")
         { "JHU" }
     ch_in_mha_dwi = Channel.fromFilePairs("$params.input/dwi-4d-mri/*.mha")
         { file(it).simpleName }
