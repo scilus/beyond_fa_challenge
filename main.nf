@@ -47,7 +47,7 @@ workflow {
     BET ( ch_dwi_to_bet )
     ch_bet_mask = BET.out.mask
 
-    // 3. Extract FA for template registration
+    // 4. Extract FA for template registration + frf masking
     ch_fa = ch_dwi_upsampled
         .join( ch_in_nifti_bvalbvec.bval )
         .join( ch_in_nifti_bvalbvec.bvec )
@@ -55,7 +55,7 @@ workflow {
 
     DTI( ch_fa )
 
-    // // 4. Register to MNI
+    // // 5. Register to MNI
     // ch_moving = ch_dwi_upsampled
     //     .map{ meta, _dwi -> [meta] }
     //     .combine( ch_in_jhu_fa.map{ _meta, template -> [template] } )
@@ -73,12 +73,12 @@ workflow {
     // ch_jhu_to_subject_ref = ch_fixed
     // ch_jhu_to_subject_transform = REGISTRATION.out.transfo_image
 
-    // 5. Threshold FA to get mask
+    // 6. Threshold FA to get FRF mask
     ch_fa_to_threshold = DTI.out.fa
     FA_LTHRESHOLD( ch_fa_to_threshold )
     ch_frf_mask = FA_LTHRESHOLD.out.image
 
-    // 6. Compute FRF
+    // 7. Compute FRF
     ch_input_frf = ch_dwi_upsampled
         .join( ch_in_nifti_bvalbvec.bval )
         .join( ch_in_nifti_bvalbvec.bvec )
@@ -88,7 +88,7 @@ workflow {
     FRF( ch_input_frf )
     ch_frf = FRF.out.frf
 
-    // 7. Compute FODF
+    // 8. Compute FODF
     ch_input_fodf = ch_dwi_upsampled
         .join( ch_in_nifti_bvalbvec.bval )
         .join( ch_in_nifti_bvalbvec.bvec )
@@ -100,6 +100,7 @@ workflow {
 
     FODF ( ch_input_fodf )
 
+    // 9. Compute Freewater
     ch_in_fw = ch_dwi_upsampled
         .join( ch_in_nifti_bvalbvec.bval )
         .join( ch_in_nifti_bvalbvec.bvec )

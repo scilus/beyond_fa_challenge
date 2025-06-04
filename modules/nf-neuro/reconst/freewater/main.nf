@@ -41,16 +41,13 @@ process RECONST_FREEWATER {
         $perp_diff_max $iso_diff $lambda1 $lambda2 $nb_threads $b_thr \
         $set_mask $set_kernels
 
+    mv results/DWI_corrected.nii.gz ${prefix}__dwi_fw_corrected.nii.gz
+    mv results/fit_dir.nii.gz ${prefix}__FIT_dir.nii.gz
+    mv results/fit_FiberVolume.nii.gz ${prefix}__FIT_FiberVolume.nii.gz
+    mv results/fit_FW.nii.gz ${prefix}__FIT_FW.nii.gz
+    mv results/fit_NRMSE.nii.gz ${prefix}__FIT_nrmse.nii.gz
 
-    if [ -d "$kernels" ]; then
-        mv results/dwi_fw_corrected.nii.gz ${prefix}__dwi_fw_corrected.nii.gz
-        mv results/FIT_dir.nii.gz ${prefix}__FIT_dir.nii.gz
-        mv results/FIT_FiberVolume.nii.gz ${prefix}__FIT_FiberVolume.nii.gz
-        mv results/FIT_FW.nii.gz ${prefix}__FIT_FW.nii.gz
-        mv results/FIT_nrmse.nii.gz ${prefix}__FIT_nrmse.nii.gz
-
-        rm -rf results
-    fi
+    rm -rf results
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
