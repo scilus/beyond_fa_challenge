@@ -2,3 +2,5 @@ work/
 .nextflow.log*
 .nextflow/
 results/
+*.mha
+*.json
