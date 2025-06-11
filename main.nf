@@ -10,6 +10,7 @@ include { VOLUME_MATH as FA_LTHRESHOLD;
 include { VOLUME_MATH as FA_INTERSECTION } from './modules/local/volume_math/double.nf'
 include { RECONST_FODF as FODF           } from './modules/nf-neuro/reconst/fodf'
 include { RECONST_FREEWATER as FW        } from './modules/nf-neuro/reconst/freewater'
+include { BUNDLEPARC as BUNDLEPARC       } from './modules/local/fodf/bundleparc' 
 
 
 workflow {
@@ -102,4 +103,7 @@ workflow {
 
     FW ( ch_in_fw )
 
+    // 10. BundleParc   
+    ch_fodf = FODF.out.fodf
+    BUNDLEPARC ( ch_fodf )
 }
