@@ -12,3 +12,4 @@ echo "export NFCORE_SUBWORKFLOWS_BRANCH=main" >> ~/.bashrc
 echo "export PROFILE=docker" >> ~/.bashrc
 
 python3 -m pip install nf-core==3.2.1
+python3 -m pip install simpleitk==2.5.0
