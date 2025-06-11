@@ -1,3 +1,4 @@
+include { CONVERT_CHALLENGE_INPUTS       } from "./modules/local/utils/convert"
 include { IMAGE_RESAMPLE as UPSAMPLE     } from "./modules/nf-neuro/image/resample"
 include { BETCROP_FSLBETCROP as BET      } from "./modules/nf-neuro/betcrop/fslbetcrop"
 include { RECONST_DTIMETRICS as DTI      } from './modules/nf-neuro/reconst/dtimetrics'  
