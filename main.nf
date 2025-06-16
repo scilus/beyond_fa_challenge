@@ -18,10 +18,8 @@ include { BUNDLEPARC as BUNDLEPARC       } from './modules/local/fodf/bundleparc
 
 
 workflow {
-    ch_in_jhu_labels = Channel.fromFilePairs("$projectDir/data/JHU/JHU-ICBM-labels-1mm.nii.gz")
-        { "JHU" }
-    ch_in_jhu_fa = Channel.fromFilePairs("$projectDir/data/JHU/JHU-ICBM-FA-1mm.nii.gz")
-        { "JHU" }
+    ch_in_jhu_labels = Channel.fromFilePairs("$projectDir/data/JHU/JHU-ICBM-labels-1mm.nii.gz", size: 1, flat: true)
+    ch_in_jhu_fa = Channel.fromFilePairs("$projectDir/data/JHU/JHU-ICBM-FA-1mm.nii.gz", size: 1, flat: true)
 
     ch_in_mha_json = Channel.fromFilePairs("$params.input/**/*.{mha,json}", size: 2, flat: true)
         { file(it).simpleName.tokenize("_")[0..1].join("_") }
@@ -66,9 +64,10 @@ workflow {
         .combine( ch_in_jhu_fa.map{ _meta, template -> [template] } )
     ch_fixed = DTI_POST_FW.out.fa
 
+    // I had to flip fixed and moving to fix the results (error to fix)
     REGISTRATION(
-        ch_moving,
         ch_fixed,
+        ch_moving,
         Channel.empty(),
         Channel.empty(),
         Channel.empty(),
@@ -76,10 +75,11 @@ workflow {
     )
 
     // 5.1 Apply registration to JHU labels
-    ch_jhu_labels = ch_in_jhu_labels
-        .join( REGISTRATION.out.image_warped )
+    ch_jhu_labels = REGISTRATION.out.image_warped
         .join( REGISTRATION.out.transfo_image )
-    ch_jhu_labels.view()
+        .combine( ch_in_jhu_labels )
+        .map{ meta, warped, nonlinear, linear, _jhu_id, jhu_labels ->
+            [meta, jhu_labels, warped, nonlinear, linear] }
     TRANSFORM_LABELS_TO_SUBJECT( ch_jhu_labels )
 
     // 6. Threshold FA to get FRF mask
