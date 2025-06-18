@@ -14,8 +14,8 @@ include { VOLUME_MATH as FA_LTHRESHOLD;
 include { VOLUME_MATH as FA_INTERSECTION } from './modules/local/volume_math/double.nf'
 include { RECONST_FODF as FODF           } from './modules/nf-neuro/reconst/fodf'
 include { RECONST_FREEWATER as FW        } from './modules/nf-neuro/reconst/freewater'
-include { BUNDLEPARC as BUNDLEPARC       } from './modules/local/fodf/bundleparc' 
-
+include { BUNDLEPARC as BUNDLEPARC       } from './modules/local/fodf/bundleparc'
+include { EXTRACT_METRICS_JHU } from './modules/local/utils/extract_metrics_all'
 
 workflow {
     ch_in_jhu_labels = Channel.fromFilePairs("$projectDir/data/JHU/JHU-ICBM-labels-1mm.nii.gz", size: 1, flat: true)
@@ -81,6 +81,10 @@ workflow {
         .map{ meta, warped, nonlinear, linear, _jhu_id, jhu_labels ->
             [meta, jhu_labels, warped, nonlinear, linear] }
     TRANSFORM_LABELS_TO_SUBJECT( ch_jhu_labels )
+    
+    ch_jhu_labels_fw = TRANSFORM_LABELS_TO_SUBJECT.out.warped_image
+        .join(FW.out.fw)
+    EXTRACT_METRICS_JHU( ch_jhu_labels_fw )
 
     // 6. Threshold FA to get FRF mask
     ch_fa_to_threshold = DTI_POST_FW.out.fa
