@@ -50,6 +50,11 @@
             "git_sha": "8b713829fd96b11f3cee6c6f4d502848cbc392d1",
             "installed_by": ["registration"]
           },
+          "registration/antsapplytransforms": {
+            "branch": "main",
+            "git_sha": "33ceec0aee17c292548d325cf645b3e4a77537b8",
+            "installed_by": ["modules"]
+          },
           "registration/easyreg": {
             "branch": "main",
             "git_sha": "47cd7af16914614d41cee6099aa994d04a6f8380",
