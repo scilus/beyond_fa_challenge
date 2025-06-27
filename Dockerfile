@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=scilus/scilus:latest
+ARG BASE_IMAGE=scilus/scilus:2.1.0
 FROM $BASE_IMAGE
 
 RUN apt-get update && apt-get -y install \

@@ -7,6 +7,7 @@ include { BETCROP_FSLBETCROP as BET      } from "./modules/nf-neuro/betcrop/fslb
 include { RECONST_DTIMETRICS as DTI_POST_FW      } from './modules/nf-neuro/reconst/dtimetrics'
 include { REGISTRATION                   } from "./subworkflows/nf-neuro/registration"
 include { REGISTRATION_ANTSAPPLYTRANSFORMS as TRANSFORM_LABELS_TO_SUBJECT } from './modules/nf-neuro/registration/antsapplytransforms/main'
+include { REGISTRATION_ANTSAPPLYTRANSFORMS as TRANSFORM_BP_TO_SUBJECT } from './modules/nf-neuro/registration/antsapplytransforms/main'
 include { RECONST_FRF as FRF             } from './modules/nf-neuro/reconst/frf'
 include { VOLUME_MATH as FA_LTHRESHOLD;
           VOLUME_MATH as FA_UTHRESHOLD;
@@ -23,6 +24,8 @@ include { EXTRACT_METRICS_BUNDLEPARC as EXTRACT_METRICS_BUNDLEPARC_LABELS } from
 workflow {
     ch_in_jhu_labels = Channel.fromFilePairs("$projectDir/data/JHU/JHU-ICBM-labels-1mm.nii.gz", size: 1, flat: true)
     ch_in_jhu_fa = Channel.fromFilePairs("$projectDir/data/JHU/JHU-ICBM-FA-1mm.nii.gz", size: 1, flat: true)
+    ch_in_bundleparc_labels = Channel.fromPath("$projectDir/data/BundleParc/*.nii.gz")
+
 
     ch_in_mha_json = Channel.fromFilePairs("$params.input/**/*.{mha,json}", size: 2, flat: true)
         { file(it).simpleName.tokenize("_")[0..1].join("_") }
@@ -84,46 +87,26 @@ workflow {
         .combine( ch_in_jhu_labels )
         .map{ meta, warped, nonlinear, linear, _jhu_id, jhu_labels ->
             [meta, jhu_labels, warped, nonlinear, linear] }
-    TRANSFORM_LABELS_TO_SUBJECT( ch_jhu_labels )
     
+    TRANSFORM_LABELS_TO_SUBJECT( ch_jhu_labels )
+
+    // 5.2 Extract metrics from JHU
     ch_jhu_labels_fw = TRANSFORM_LABELS_TO_SUBJECT.out.warped_image
         .join(FW.out.fw)
     EXTRACT_METRICS_JHU( ch_jhu_labels_fw )
 
-    // 6. Threshold FA to get FRF mask
-    ch_fa_to_threshold = DTI_POST_FW.out.fa
-    FA_LTHRESHOLD( ch_fa_to_threshold )
-    ch_frf_mask = FA_LTHRESHOLD.out.image
+    // 6 Apply registration to BundleParc labels
+    ch_bp_labels = REGISTRATION.out.image_warped
+        .join( REGISTRATION.out.transfo_image )
+        .combine( ch_in_bundleparc_labels )
+        .map{ meta, ref, warp, affine, img -> [meta, img, ref, warp, affine] }
+    TRANSFORM_BP_TO_SUBJECT( ch_bp_labels )
 
-    // 7. Compute FRF
-    ch_input_frf = ch_dwi_bet_cropped
-        .join( ch_in_nifti_bvalbvec.bval )
-        .join( ch_in_nifti_bvalbvec.bvec )
-        .join( ch_frf_mask )
-        .map{ meta, dwi, bval, bvec, mask -> [meta, dwi, bval, bvec, mask, [], [], []] }
+    ch_bundleparc_labels_fw = TRANSFORM_BP_TO_SUBJECT.out.warped_image.groupTuple()
+            .join( FW.out.fw, by: 0)
+        
+    ch_bundleparc_labels_fw.view ( x -> x)
 
-    FRF( ch_input_frf )
-    ch_frf = FRF.out.frf
-
-    // 8. Compute FODF
-    ch_input_fodf = ch_dwi_bet_cropped
-        .join( ch_in_nifti_bvalbvec.bval )
-        .join( ch_in_nifti_bvalbvec.bvec )
-        .join( ch_bet_mask )
-        .join( DTI_POST_FW.out.fa )
-        .join( DTI_POST_FW.out.md )
-        .join( ch_frf )
-        .map{ it + [[], []] }
-
-    FODF ( ch_input_fodf )
-
-    // 11. BundleParc
-    ch_fodf = FODF.out.fodf
-    BUNDLEPARC ( ch_fodf )
-
-    ch_bundleparc_labels_fw = BUNDLEPARC.out.labels_maps
-        .join( FW.out.fw )
-        .map{ meta, labels, fw -> [meta, labels, fw] }
     EXTRACT_METRICS_BUNDLEPARC_LABELS( ch_bundleparc_labels_fw )
     EXTRACT_METRICS_BUNDLEPARC_BINARY( ch_bundleparc_labels_fw )
 }
