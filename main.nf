@@ -102,10 +102,11 @@ workflow {
         .map{ meta, ref, warp, affine, img -> [meta, img, ref, warp, affine] }
     TRANSFORM_BP_TO_SUBJECT( ch_bp_labels )
 
-    // 6.1 Extract metrics from BundleParc labels
-    ch_bundleparc_labels_fw = TRANSFORM_BP_TO_SUBJECT.out.warped_image
-        .combine( FW.out.fw, by: 0)
-   
+    ch_bundleparc_labels_fw = TRANSFORM_BP_TO_SUBJECT.out.warped_image.groupTuple()
+            .join( FW.out.fw, by: 0)
+        
+    ch_bundleparc_labels_fw.view ( x -> x)
+
     EXTRACT_METRICS_BUNDLEPARC_LABELS( ch_bundleparc_labels_fw )
     EXTRACT_METRICS_BUNDLEPARC_BINARY( ch_bundleparc_labels_fw )
 }
