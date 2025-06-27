@@ -87,30 +87,25 @@ workflow {
         .combine( ch_in_jhu_labels )
         .map{ meta, warped, nonlinear, linear, _jhu_id, jhu_labels ->
             [meta, jhu_labels, warped, nonlinear, linear] }
-    TRANSFORM_LABELS_TO_SUBJECT( ch_jhu_labels )
     
+    TRANSFORM_LABELS_TO_SUBJECT( ch_jhu_labels )
+
     // 5.2 Extract metrics from JHU
     ch_jhu_labels_fw = TRANSFORM_LABELS_TO_SUBJECT.out.warped_image
         .join(FW.out.fw)
     EXTRACT_METRICS_JHU( ch_jhu_labels_fw )
 
     // 6 Apply registration to BundleParc labels
-    // Doesn't work need help
     ch_bp_labels = REGISTRATION.out.image_warped
         .join( REGISTRATION.out.transfo_image )
         .combine( ch_in_bundleparc_labels )
-        .map{ meta, warped, nonlinear, linear, _bp_id, bp_labels ->
-            [meta, bp_labels, warped, nonlinear, linear] }
-    ch_bp_labels.view(x -> x)
+        .map{ meta, ref, warp, affine, img -> [meta, img, ref, warp, affine] }
     TRANSFORM_BP_TO_SUBJECT( ch_bp_labels )
 
     // 6.1 Extract metrics from BundleParc labels
-    // Doesn't work need help
     ch_bundleparc_labels_fw = TRANSFORM_BP_TO_SUBJECT.out.warped_image
-        .combine( FW.out.fw )
-        .map{ meta, label, fw -> [meta, label, fw] }
-    ch_bundleparc_labels_fw.view( x -> x)
-
+        .combine( FW.out.fw, by: 0)
+   
     EXTRACT_METRICS_BUNDLEPARC_LABELS( ch_bundleparc_labels_fw )
     EXTRACT_METRICS_BUNDLEPARC_BINARY( ch_bundleparc_labels_fw )
 }
