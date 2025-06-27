@@ -3,7 +3,7 @@
     "build": {
         "dockerfile": "../Dockerfile",
         "args": {
-            "BASE_IMAGE": "scilus/scilus:latest"
+            "BASE_IMAGE": "scilus/scilus:2.1.0"
         }
     },
     "onCreateCommand": "bash .devcontainer/onCreateCommand.sh",
