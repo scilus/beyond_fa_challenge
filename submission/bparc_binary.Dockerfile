@@ -47,4 +47,4 @@ COPY data /beyond_fa_challenge/data/
 
 WORKDIR /workdir
 COPY --chown=${USERNAME}:${USERNAME} --chmod=755 /submission/entrypoint.sh /code/entrypoint.sh
-ENTRYPOINT [ "/code/entrypoint.sh" ]
+ENTRYPOINT [ "/code/entrypoint.sh", "--extract_bundleparc_binary" ]
