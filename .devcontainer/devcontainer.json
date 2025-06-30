@@ -1,7 +1,7 @@
 {
     "name": "Beyond FA devcontainer - SCIL team",
     "build": {
-        "dockerfile": "../Dockerfile",
+        "dockerfile": "./Dockerfile",
         "args": {
             "BASE_IMAGE": "scilus/scilus:2.1.0"
         }
