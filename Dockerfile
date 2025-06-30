@@ -9,7 +9,6 @@ RUN apt-get update && apt-get -y install \
     && rm -rf /var/lib/apt/lists/*
 
 ADD --link https://github.com/nextflow-io/nextflow/releases/download/v${NEXTFLOW_VERSION}/nextflow-${NEXTFLOW_VERSION}-all /nextflow/nextflow
-# ADD --link https://github.com/scilus/beyond_fa_challenge.git /beyond_fa_challenge
 WORKDIR /nextflow
 RUN bash nextflow && \
     chmod ugo+rx nextflow && \
@@ -19,9 +18,11 @@ RUN bash nextflow && \
 
 RUN pip install SimpleITK 
 
-COPY main.nf nextflow.config /beyond_fa_challenge/
-COPY modules /beyond_fa_challenge/modules/
-COPY subworkflows /beyond_fa_challenge/subworkflows/
-COPY data /beyond_fa_challenge/data/
+ADD --link https://github.com/scilus/beyond_fa_challenge.git /beyond_fa_challenge
+# Copies for dev purpose only, if you need to instanciate the pipeline from local modifications
+# COPY main.nf nextflow.config /beyond_fa_challenge/
+# COPY modules /beyond_fa_challenge/modules/
+# COPY subworkflows /beyond_fa_challenge/subworkflows/
+# COPY data /beyond_fa_challenge/data/
 COPY --chmod=755 /submission/entrypoint.sh /code/entrypoint.sh
 ENTRYPOINT [ "/code/entrypoint.sh" ]
