@@ -22,6 +22,17 @@ include { EXTRACT_METRICS_BUNDLEPARC as EXTRACT_METRICS_BUNDLEPARC_LABELS } from
 
 
 workflow {
+    // Parameters
+    log.info "--------------"
+    log.info "Input folder: $params.input"
+    log.info "Output folder: $params.output"
+    log.info "Output json: $params.output/$params.out_json"
+
+    log.info "Extract JHU: $params.extract_JHU"
+    log.info "Extract BundleParc labels: $params.extract_bundleparc_labels"
+    log.info "Extract BundleParc binary: $params.extract_bundleparc_binary"
+    log.info "--------------"
+
     ch_in_jhu_labels = Channel.fromFilePairs("$projectDir/data/JHU/JHU-ICBM-labels-1mm.nii.gz", size: 1, flat: true)
     ch_in_jhu_fa = Channel.fromFilePairs("$projectDir/data/JHU/JHU-ICBM-FA-1mm.nii.gz", size: 1, flat: true)
     ch_in_bundleparc_labels = Channel.fromPath("$projectDir/data/BundleParc/*.nii.gz")
@@ -104,8 +115,6 @@ workflow {
 
     ch_bundleparc_labels_fw = TRANSFORM_BP_TO_SUBJECT.out.warped_image.groupTuple()
             .join( FW.out.fw, by: 0)
-        
-    ch_bundleparc_labels_fw.view ( x -> x)
 
     EXTRACT_METRICS_BUNDLEPARC_LABELS( ch_bundleparc_labels_fw )
     EXTRACT_METRICS_BUNDLEPARC_BINARY( ch_bundleparc_labels_fw )
