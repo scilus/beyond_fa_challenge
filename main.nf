@@ -28,7 +28,7 @@ workflow {
 
 
     ch_in_mha_json = Channel.fromFilePairs("$params.input/**/*.{mha,json}", size: 2, flat: true)
-        { file(it).simpleName.tokenize("_")[0..1].join("_") }
+        { file(it).parent.name }
         .map{ id, json, mha -> [[id: id], mha, json] }
 
     ch_in_nifti_bvalbvec = CONVERT_CHALLENGE_INPUTS( ch_in_mha_json )
