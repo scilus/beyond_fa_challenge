@@ -38,9 +38,13 @@ workflow {
     ch_in_bundleparc_labels = Channel.fromPath("$projectDir/data/BundleParc/*.nii.gz")
 
 
-    ch_in_mha_json = Channel.fromFilePairs("$params.input/**/*.{mha,json}", size: 2, flat: true)
-        { file(it).parent.name }
-        .map{ id, json, mha -> [[id: id], mha, json] }
+    ch_in_mha = Channel.fromPath("$params.input/**/*.mha")
+        .map{ mha -> [[id: file(mha).parent.name], mha] }
+
+    ch_in_json = Channel.fromPath("$params.input/**/*.json")
+
+    ch_in_mha_json = ch_in_mha
+        .combine(ch_in_json)
 
     ch_in_nifti_bvalbvec = CONVERT_CHALLENGE_INPUTS( ch_in_mha_json )
 
